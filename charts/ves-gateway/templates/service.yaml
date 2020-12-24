@@ -1,0 +1,18 @@
+{{- $cnfHdr := (dict "" "") -}}
+{{- include "cnfTplHeader_2_9" (dict "cnfHdr" $cnfHdr "dot" . ) -}}
+apiVersion: v1
+kind: Service
+{{- include "cnfTplMetadata_2_9" (dict "setOffset" "0" "cnfHdr" $cnfHdr "metadata" .Values.componentSpec.service.metaspec) }}
+spec:
+  selector:
+    app: ves-gateway
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: 9095
+      protocol: TCP
+      name: http
+    - port: 8095
+      targetPort: 8095
+      protocol: TCP
+      name: client
+  type: {{ .Values.service.type }}

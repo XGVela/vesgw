@@ -1,0 +1,66 @@
+{{- if .Values.enableSimualtor }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "ves-simu-chart.fullname" . }}
+{{- if and (.Values.global) (.Values.global.xgvela) (.Values.global.xgvela.use_release_ns) }}
+  namespace: {{ .Release.Namespace }}
+{{- else }}
+  namespace: {{ .Values.namespace }}
+{{- end }}
+  labels:
+    app: {{ template "ves-simu-chart.name" . }}
+    chart: {{ template "ves-simu-chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "ves-simu-chart.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "ves-simu-chart.name" . }}
+        release: {{ .Release.Name }}
+    spec:
+      {{- if and (.Values.global) (.Values.global.xgvela) (.Values.global.xgvela.mgmtNodeSelector) (.Values.global.xgvela.mgmtNodeSelector.enabled) }}
+      nodeSelector:
+          {{ .Values.global.xgvela.mgmtNodeSelector.labelKey }}: {{ .Values.global.xgvela.mgmtNodeSelector.labelValue | quote }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- if .Values.global.hub }}
+          image: {{ .Values.global.hub }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}
+          {{- else }}
+          image: {{ .Values.image.hub }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          {{- end }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8443
+              protocol: TCP
+#          envFrom:
+#            - configMapRef:
+#                name: vespa-config
+#            - secretRef:
+#                name: vespa-secrets
+          env:
+            - name: VESMGR_APPMGRDOMAIN
+              value: appmgr-service
+
+          livenessProbe:
+            httpGet:
+              path: /testControl/v7/stats
+              port: 8443
+            initialDelaySeconds: 30
+            periodSeconds: 60
+          volumeMounts:
+          - name: configsimu
+            mountPath: /etc/ves-agent/
+      volumes:
+      - name: configsimu
+        configMap:
+          name: ves-simu-config
+{{- end }}

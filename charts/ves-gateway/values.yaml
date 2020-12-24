@@ -1,0 +1,160 @@
+######## CNF TEMPLATE DEFINITIONS ###########
+nf:
+  version: "ves_gw_tag"
+  vendorId: "mvnr"
+  xgvelaId: "xgvela1"
+  nfClass: "mgmt"
+  nfType: "xgvela"
+  nfId: "xgvela1"
+  cnftpl_configmap:
+    mgmt_cfg:
+      create: true
+      metaspec:
+        annotations:
+          configMgmt: enabled
+    static_cfg:
+      create: true
+      metaspec: {}
+    env_cfg:
+      create: false
+      metaspec: {}
+  cnftpl_secret:
+      create: false
+      metaspec: {}
+      secretspec: {}
+  cnftpl_namespaces:
+      create: false
+      metaspec: {}
+  cnftpl_dashboard:
+      create: false
+      metaspec: {}
+  cnftpl_eventdef:
+      create: true
+      metaspec: {}
+  cnftpl_alertsdef:
+      create: false
+      metaspec: {}
+  cnftpl_metricsdef:
+      create: false
+      metaspec: {}
+
+###########################################
+
+mmaas_enabled: true
+namespace: xgvela-xgvela1-mgmt-xgvela-xgvela1
+etcd_svc_fqdn: "etcd.xgvela-xgvela1-infra-xgvela-xgvela1.svc.cluster.local:2379"
+
+common:
+  app_name: ves-gateway
+
+
+serviceaccount: ves-gateway
+
+componentSpec:
+  deployment:
+    metaspec:
+      ext_name: v1
+    pod_metaspec:
+      labels:
+        app: ves-gateway
+      annotations:
+        sidecar.istio.io/inject: "false"
+        prometheus.io/scrape: "true"
+        prometheus.io/path: /metrics
+        prometheus.io/port: "8000"
+  service:
+    metaspec:
+      labels:
+        app: ves-gateway
+  configmap:
+     metaspec:
+       ext_name: config
+
+
+service:
+  type: ClusterIP
+  port: 9095
+
+oam_sidecar:
+  container:
+    hostname: oam-sidecar
+    image:
+      repository: cim
+      tag: v1.11
+    resource:
+      limit_memory: 500Mi
+      limit_cpu: 100m
+    ports:
+      server: 4222
+    mount:
+      type: Directory
+      container_path: /opt/logs
+      host_path: /data/logs
+
+replicaCount: 1
+
+ves_gateway:
+  image:
+    hub: 10.1.34.190:5000
+    repository: ves-gw
+    tag: ves_gw_tag
+    pullPolicy: Always
+  init_container:
+    image:
+      repository: xgvela-svc-init
+      tag: v0.3.4
+
+
+data:
+  datadir: ./data
+  KafkaAddress: "kafka-svc.xgvela-xgvela1-infra-xgvela-xgvela1.svc.cluster.local:9092"
+  collectorDetails:
+  vesdomains:
+    fault:
+      collectorList:
+        - id: 1
+    measurement:
+      collectorList:
+        - id: 1
+    notification:
+      collectorList:
+        - id: 1
+    tca:
+      collectorList:
+        - id: 1
+  heartbeat:
+    defaultInterval: 60s
+  measurement:
+    defaultInterval: 30s
+    maxBufferingDuration: 1h
+    prometheus:
+      paas_endpoint: "http://paas-prometheus-server.xgvela-paas.svc.cluster.local:9090"
+      xgvela_endpoint: "http://xgvela-prometheus-server.xgvela-xgvela1-mgmt-xgvela-xgvela1.svc.cluster.local:9090"
+      timeout: 30s
+      keepalive: 30s
+  event:
+    maxSize: 2000000
+    retryInterval: 5s
+    maxMissed: 2
+  alertManager:
+    bind:
+      bindip: "0.0.0.0"
+      port: 9095
+  cluster:
+    enable: false
+    debug: true
+    displayLogs: true
+    id: "1"
+    peers:
+      - id: "1"
+        address: "127.0.0.1:6737"
+      - id: "2"
+        address: "127.0.0.1:6738"
+      - id: "3"
+        address: "127.0.0.1:6739"
+  loglevel: "InfoLevel"
+  XGVelaInfo:
+    dnPrefix: "mvnr"
+    CMAAS_NETCONF_PORT: "32767"
+    FMAAS_HTTP_PORT: "32666"
+    MGMT_IP: "0.0.0.0"

@@ -1,0 +1,292 @@
+[
+    {
+        "metadata": {
+            "name": "xApp1",
+            "configName": "xApp1-appconfig",
+            "namespace": "default"
+        },
+        "descriptor": {
+            "$id": "http://example.com/root.json",
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "definitions": {
+
+            },
+            "properties": {
+                "local": {
+                    "$id": "#/properties/local",
+                    "properties": {
+                        "host": {
+                            "$id": "#/properties/local/properties/host",
+                            "default": "",
+                            "examples": [
+                                ":8080"
+                            ],
+                            "pattern": "^(.*)$",
+                            "title": "The Host Schema",
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "host"
+                    ],
+                    "title": "The Local Schema",
+                    "type": "object"
+                },
+                "logger": {
+                    "$id": "#/properties/logger",
+                    "properties": {
+                        "level": {
+                            "$id": "#/properties/logger/properties/level",
+                            "default": 0,
+                            "examples": [
+                                3
+                            ],
+                            "title": "The Level Schema",
+                            "type": "integer"
+                        }
+                    },
+                    "required": [
+                        "level"
+                    ],
+                    "title": "The Logger Schema",
+                    "type": "object"
+                },
+                "metrics": {
+                    "$id": "#/properties/metrics",
+                    "items": {
+                        "$id": "#/properties/metrics/items",
+                        "properties": {
+                            "description": {
+                                "$id": "#/properties/metrics/items/properties/description",
+                                "default": "",
+                                "examples": [
+                                    "Example counter 1"
+                                ],
+                                "pattern": "^(.*)$",
+                                "title": "The Description Schema",
+                                "type": "string"
+                            },
+                            "enabled": {
+                                "$id": "#/properties/metrics/items/properties/enabled",
+                                "default": false,
+                                "examples": [
+                                    true
+                                ],
+                                "title": "The Enabled Schema",
+                                "type": "boolean"
+                            },
+                            "name": {
+                                "$id": "#/properties/metrics/items/properties/name",
+                                "default": "",
+                                "examples": [
+                                    "App1ExampleCounterOne"
+                                ],
+                                "pattern": "^(.*)$",
+                                "title": "The Name Schema",
+                                "type": "string"
+                            },
+                            "type": {
+                                "$id": "#/properties/metrics/items/properties/type",
+                                "default": "",
+                                "examples": [
+                                    "counter"
+                                ],
+                                "pattern": "^(.*)$",
+                                "title": "The Type Schema",
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "name",
+                            "type",
+                            "enabled",
+                            "description"
+                        ],
+                        "title": "The Items Schema",
+                        "type": "object"
+                    },
+                    "title": "The Metrics Schema",
+                    "type": "array"
+                }
+            },
+            "required": [
+                "local",
+                "logger",
+                "metrics"
+            ],
+            "title": "ANR Descriptor Schema",
+            "type": "object"
+        },
+        "config": {
+            "local": {
+                "host": ":8080"
+            },
+            "logger": {
+                "level": 5
+            },
+            "metrics": [
+                {
+                    "description": "Example counter 1",
+                    "enabled": true,
+                    "name": "App1ExampleCounterOne",
+                    "type": "counter",
+                    "objectName": "App1ExampleCounterOneObject",
+                    "objectInstance": "App1ExampleCounterOneObjectInstance"
+                },
+                {
+                    "description": "Example counter 2",
+                    "enabled": true,
+                    "name": "App1ExampleCounterTwo",
+                    "type": "counter",
+                    "objectName": "App1ExampleCounterTwoObject",
+                    "objectInstance": "App1ExampleCounterTwoObjectInstance"
+                }
+            ]
+        }
+    },
+    {
+        "metadata": {
+            "name": "xApp2",
+            "configName": "xApp2-appconfig",
+            "namespace": "default"
+        },
+        "descriptor": {
+            "$id": "http://example.com/root.json",
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "definitions": {
+
+            },
+            "properties": {
+                "local": {
+                    "$id": "#/properties/local",
+                    "properties": {
+                        "host": {
+                            "$id": "#/properties/local/properties/host",
+                            "default": "",
+                            "examples": [
+                                ":8080"
+                            ],
+                            "pattern": "^(.*)$",
+                            "title": "The Host Schema",
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "host"
+                    ],
+                    "title": "The Local Schema",
+                    "type": "object"
+                },
+                "logger": {
+                    "$id": "#/properties/logger",
+                    "properties": {
+                        "level": {
+                            "$id": "#/properties/logger/properties/level",
+                            "default": 0,
+                            "examples": [
+                                3
+                            ],
+                            "title": "The Level Schema",
+                            "type": "integer"
+                        }
+                    },
+                    "required": [
+                        "level"
+                    ],
+                    "title": "The Logger Schema",
+                    "type": "object"
+                },
+                "metrics": {
+                    "$id": "#/properties/metrics",
+                    "items": {
+                        "$id": "#/properties/metrics/items",
+                        "properties": {
+                            "description": {
+                                "$id": "#/properties/metrics/items/properties/description",
+                                "default": "",
+                                "examples": [
+                                    ""
+                                ],
+                                "pattern": "^(.*)$",
+                                "title": "The Description Schema",
+                                "type": "string"
+                            },
+                            "enabled": {
+                                "$id": "#/properties/metrics/items/properties/enabled",
+                                "default": false,
+                                "examples": [
+                                    true
+                                ],
+                                "title": "The Enabled Schema",
+                                "type": "boolean"
+                            },
+                            "name": {
+                                "$id": "#/properties/metrics/items/properties/name",
+                                "default": "",
+                                "examples": [
+                                    "UEContextCreated"
+                                ],
+                                "pattern": "^(.*)$",
+                                "title": "The Name Schema",
+                                "type": "string"
+                            },
+                            "type": {
+                                "$id": "#/properties/metrics/items/properties/type",
+                                "default": "",
+                                "examples": [
+                                    "counter"
+                                ],
+                                "pattern": "^(.*)$",
+                                "title": "The Type Schema",
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "name",
+                            "type",
+                            "enabled",
+                            "description"
+                        ],
+                        "title": "The Items Schema",
+                        "type": "object"
+                    },
+                    "title": "The Metrics Schema",
+                    "type": "array"
+                }
+            },
+            "required": [
+                "local",
+                "logger",
+                "metrics"
+            ],
+            "title": "The Root Schema",
+            "type": "object"
+        },
+        "config": {
+            "local": {
+                "host": ":8080"
+            },
+            "logger": {
+                "level": 3
+            },
+            "metrics": [
+                {
+                    "description": "Example counter",
+                    "enabled": true,
+                    "name": "App2ExampleCounterOne",
+                    "type": "counter",
+                    "objectName": "App2ExampleCounterOneObject",
+                    "objectInstance": "App2ExampleCounterOneObjectInstance"
+                },
+                {
+                    "description": "Another example counter",
+                    "enabled": true,
+                    "name": "App2ExampleCounterTwo",
+                    "type": "counter",
+                    "objectName": "App2ExampleCounterTwoObject",
+                    "objectInstance": "App2ExampleCounterTwoObjectInstance"
+                }
+            ]
+        }
+    }
+]

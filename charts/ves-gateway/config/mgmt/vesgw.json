@@ -1,0 +1,84 @@
+{
+   "config":{
+      {{- if hasKey .Values "primaryCollector" }}
+          "collectorDetails":[
+             {
+                "id":1,
+                "primaryCollector":{
+                   "fqdn":"{{ .Values.primaryCollector.fqdn }}",
+                   "port":{{ .Values.primaryCollector.port }},
+                   "secure":{{ .Values.primaryCollector.secure }},
+                   "user":"{{ .Values.primaryCollector.user }}",
+                   "password":"{{ .Values.primaryCollector.password }}",
+                   "passphrase":"{{ .Values.primaryCollector.passphrase }}",
+                   "nbiFormat":"{{ .Values.primaryCollector.nbiFormat }}",
+                   "nbiType":"{{ .Values.primaryCollector.nbiType }}",
+                   "kafkaBrokers":["{{ .Values.primaryCollector.kafkaBrokers }}"],
+                   "kafkaTopic":"{{ .Values.primaryCollector.kafkaTopic }}",
+                   "heartbeat":"{{ .Values.primaryCollector.heartbeat }}"
+                }
+             }
+          ],
+      {{- else }}
+          "collectorDetails":[],
+      {{- end }}
+      "vesdomains":{
+         "fault":{
+            "collectorList":[
+               {
+                  "id":1
+               }
+            ]
+         },
+         "notification":{
+            "collectorList":[
+               {
+                  "id":1
+               }
+            ]
+         },
+         "tca":{
+            "collectorList":[
+               {
+                  "id":1
+               }
+            ]
+         },
+         "measurement":{
+            "collectorList":[
+               {
+                  "id":1
+               }
+            ]
+         }
+      },
+      "heartbeat":{
+         "defaultInterval":"60s"
+      },
+      "measurement":{
+         "defaultInterval":"30s",
+         "maxBufferingDuration":"1h",
+         "prometheus":{
+            {{- if hasKey .Values "prometheus_address" }}
+                "address":"{{ .Values.prometheus_address }}",
+            {{- else }}
+                "address":"{{ .Values.data.measurement.prometheus.xgvela_endpoint }}",
+            {{- end }}
+            "timeout":"30s",
+            "keepalive":"30s"
+         }
+      },
+      "event":{
+         "maxSize":2000000,
+         "retryInterval":"5s",
+         "maxMissed":2
+      },
+      "alertManager":{
+         "bind":"0.0.0.0:9095"
+      },
+      "cluster":{
+         "debug":true,
+         "displayLogs":true
+      }
+   }
+}

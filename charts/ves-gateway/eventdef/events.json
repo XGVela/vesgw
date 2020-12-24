@@ -1,0 +1,64 @@
+{
+    "events": {
+        "PrometheusConnectivityDown": {
+            "eventType": "COMMUNICATION",
+            "perceivedSeverity": "WARNING",
+            "probableCause": "Prometheus Unreachable",
+            "specificProblem": "Not able to connect to Prometheus",
+            "rootCauseIndicator": "",
+            "trendIndication": "",
+            "correlatedNotifications": "",
+            "additionalText": "",
+            "proposedRepairAction": "Check Prometheus pod or connectivity status",
+            "serviceTypeAffected": "NONE",
+            "alarmHierarchy": "Independent",
+            "classification": "Deterioration",
+            "alarmType": "Communications alarm"
+        },
+        "PrometheusConnectivityUp": {
+            "eventType": "COMMUNICATION",
+            "perceivedSeverity": "INFO",
+            "probableCause": "Prometheus Reachable",
+            "specificProblem": "Now able to connect to Prometheus",
+            "rootCauseIndicator": "",
+            "trendIndication": "",
+            "correlatedNotifications": "PrometheusConnectivityDown",
+            "additionalText": "",
+            "proposedRepairAction": "",
+            "serviceTypeAffected": "NONE",
+            "alarmHierarchy": "Independent",
+            "classification": "Normal",
+            "alarmType": "Communications alarm"
+        },
+        "CollectorDown": {
+            "eventType": "COMMUNICATION",
+            "perceivedSeverity": "WARNING",
+            "probableCause": "Collector Unreacheable",
+            "specificProblem": "Not able to connect to Collector. Retires over",
+            "rootCauseIndicator": "",
+            "trendIndication": "",
+            "correlatedNotifications": "",
+            "additionalText": "",
+            "proposedRepairAction": "Check Collector status",
+            "serviceTypeAffected": "NONE",
+            "alarmHierarchy": "Independent",
+            "classification": "Deterioration",
+            "alarmType": "Communications alarm"
+        },
+        "CollectorUp": {
+            "eventType": "COMMUNICATION",
+            "perceivedSeverity": "INFO",
+            "probableCause": "Collector Reacheable",
+            "specificProblem": "Now Collector is reacheable",
+            "rootCauseIndicator": "",
+            "trendIndication": "",
+            "correlatedNotifications": "CollectorDown",
+            "additionalText": "",
+            "proposedRepairAction": "",
+            "serviceTypeAffected": "NONE",
+            "alarmHierarchy": "Independent",
+            "classification": "Normal",
+            "alarmType": "Communications alarm"
+        }
+    }
+}

@@ -1,0 +1,10 @@
+apiVersion: v1
+appVersion: 0.3.0
+description: A Helm chart for VES Gateway.
+engine: gotpl
+maintainers:
+- email: maintainer@xgvela.org
+  name: xGVela Maintainer
+name: ves-gateway
+tillerVersion: '>=2.8.0'
+version: 0.2.0

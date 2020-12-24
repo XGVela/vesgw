@@ -1,0 +1,110 @@
+{{- $cnfHdr := (dict "" "") -}}
+{{- include "cnfTplHeader_2_9" (dict "cnfHdr" $cnfHdr "dot" . ) -}}
+apiVersion: v1
+kind: ConfigMap
+{{- include "cnfTplMetadata_2_9" (dict "setOffset" "0" "cnfHdr" $cnfHdr "metadata" .Values.componentSpec.deployment.pod_metaspec) }}
+data:
+  ves-agent.yml: |
+    datadir: {{.Values.data.datadir}}
+    KafkaAddress: {{ .Values.global.xgvela.kafka_svc_fqdn | default .Values.data.KafkaAddress }}
+    collectorDetails:
+{{- range .Values.data.collectorDetails -}}
+  {{- printf "- id: %.0f" (.id)| nindent 4 -}}
+  {{- printf "primaryCollector:"| nindent 6 -}}
+  {{- with .primaryCollector }}
+        {{- if .serverRoot}}
+        serverRoot: {{.serverRoot}}
+        {{- end}}
+        fqdn: {{.fqdn}}
+        port: {{.port}}
+        secure: {{.secure}}
+        {{- if $.topic}}
+        topic: {{.topic}}
+        {{- end}}
+        user: {{.user}}
+        password: {{.password}}
+        passphrase: {{.passphrase}}
+  {{- end }}
+  {{- if .backupCollector -}}
+  {{- printf "backupCollector:"| nindent 6 -}}
+  {{- with .backupCollector }}
+        {{- if .serverRoot}}
+        serverRoot: {{.serverRoot}}
+        {{- end}}
+        fqdn: {{.fqdn}}
+        port: {{.port}}
+        secure: {{.secure}}
+        {{- if $.topic}}
+        topic: {{.topic}}
+        {{- end}}
+        user: {{.user}}
+        password: {{.password}}
+        passphrase: {{.passphrase}}
+  {{- end }}
+  {{- end }}
+{{- end -}}
+{{ printf "domains:" | nindent 4 -}}
+{{ printf "fault:" | nindent 6 -}}
+{{ printf "collectorList:" | nindent 8 -}}
+{{- range .Values.data.vesdomains.fault.collectorList -}}
+{{- printf "- id: %.0f" (.id)| nindent 10 -}}
+{{- end }}
+{{ printf "measurment:" | indent 6 -}}
+{{ printf "collectorList:" | nindent 8 -}}
+{{- range .Values.data.vesdomains.measurement.collectorList -}}
+{{- printf "- id: %.0f" (.id)| nindent 10 -}}
+{{- end }}
+{{ printf "notificaiton:" | indent 6 -}}
+{{ printf "collectorList:" | nindent 8 -}}
+{{- range .Values.data.vesdomains.notification.collectorList -}}
+{{- printf "- id: %.0f" (.id)| nindent 10 -}}
+{{- end }}
+{{ printf "tca:" | indent 6 -}}
+{{ printf "collectorList:" | nindent 8 -}}
+{{- range .Values.data.vesdomains.tca.collectorList -}}
+{{- printf "- id: %.0f" (.id)| nindent 10 -}}
+{{- end }}
+{{ printf "heartbeat:" | indent 4 }}
+      defaultInterval: {{.Values.data.heartbeat.defaultInterval}}
+      additionalFields:
+        {{- if .Values.global.dnPrefix }}
+        dnPrefix: {{.Values.global.dnPrefix}}
+        {{- else }}
+        dnPrefix: {{.Values.data.XGVelaInfo.dnPrefix}}
+        {{- end }}
+        xgvelaId: {{.Values.nf.xgvelaId}}
+        mgmtIP: {{.Values.data.XGVelaInfo.MGMT_IP}}
+        cmaasNetconfPort: {{.Values.data.XGVelaInfo.CMAAS_NETCONF_PORT}}
+        fmaasHTTPPort: {{.Values.data.XGVelaInfo.FMAAS_HTTP_PORT}}
+
+    measurement:
+      defaultInterval: {{.Values.data.measurement.defaultInterval}}
+      maxBufferingDuration: {{.Values.data.measurement.maxBufferingDuration}}
+      prometheus:
+      {{- if .Values.mmaas_enabled }}
+        address: {{.Values.data.measurement.prometheus.xgvela_endpoint}}
+      {{- else }}
+        address: {{.Values.data.measurement.prometheus.paas_endpoint}}
+      {{- end }}
+        timeout: {{.Values.data.measurement.prometheus.timeout}}
+        keepalive: {{.Values.data.measurement.prometheus.keepalive}}
+{{ printf "event:" | indent 4 }}
+      maxSize: {{.Values.data.event.maxSize}}
+      retryInterval: {{.Values.data.event.retryInterval}}
+      maxMissed: {{.Values.data.event.maxMissed}}
+    alertManager:
+      bind: {{.Values.data.alertManager.bind.bindip}}:{{.Values.data.alertManager.bind.port}}
+    cluster:
+      debug: {{.Values.data.cluster.debug}}
+      displayLogs: {{.Values.data.cluster.displayLogs}}
+      {{- if eq .Values.data.cluster.enable true}}
+      id: ""
+      peers:
+        - id: "ves-gateway-0"
+          address: "ves-gateway-0.ves-gateway.xgvela-xgvela1-mgmt-xgvela-xgvela1.svc.cluster.local:6737"
+        - id: "ves-gateway-1"
+          address: "ves-gateway-1.ves-gateway.xgvela-xgvela1-mgmt-xgvela-xgvela1.svc.cluster.local:6737"
+        - id: "ves-gateway-2"
+          address: "ves-gateway-2.ves-gateway.xgvela-xgvela1-mgmt-xgvela-xgvela1.svc.cluster.local:6737"
+      {{- end}}
+    loglevel: {{.Values.data.loglevel}}

@@ -1,0 +1,145 @@
+{{- $cnfHdr := (dict "" "") -}}
+{{- include "cnfTplHeader_2_9" (dict "cnfHdr" $cnfHdr "dot" . ) -}}
+apiVersion: apps/v1
+kind: StatefulSet
+{{- include "cnfTplMetadata_2_9" (dict "setOffset" "0" "cnfHdr" $cnfHdr "metadata") }}
+spec:
+  serviceName: {{ .Values.common.app_name }}
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.common.app_name }}
+  template:
+    {{- include "cnfTplMetadata_2_9" (dict "setOffset" "4" "cnfHdr" $cnfHdr "metadata" .Values.componentSpec.deployment.pod_metaspec) }}
+    spec:
+      {{- if and (.Values.global) (.Values.global.xgvela) (.Values.global.xgvela.mgmtNodeSelector) (.Values.global.xgvela.mgmtNodeSelector.enabled) }}
+      nodeSelector:
+          {{ .Values.global.xgvela.mgmtNodeSelector.labelKey }}: {{ .Values.global.xgvela.mgmtNodeSelector.labelValue | quote }}
+      {{- end }}
+      serviceAccountName: xgvela-sa
+      containers:
+      - name: {{ .Values.common.app_name }}
+        {{- if .Values.global.hub }}
+        image: {{ .Values.global.hub }}/{{ .Values.ves_gateway.image.repository }}:{{ .Values.ves_gateway.image.tag }}
+        {{- else }}
+        image: {{ .Values.ves_gateway.image.hub }}/{{ .Values.ves_gateway.image.repository }}:{{ .Values.ves_gateway.image.tag }}
+        {{- end }}
+        imagePullPolicy: {{ .Values.ves_gateway.image.pullPolicy }}
+        ports:
+          - name: http
+            containerPort: 9095
+            protocol: TCP
+        env:
+         - name: K8S_CONTAINER_ID
+           valueFrom:
+            fieldRef:
+             fieldPath: metadata.name
+         - name: K8S_NAMESPACE
+           valueFrom:
+            fieldRef:
+             fieldPath: metadata.namespace
+         - name: ZK_SVC_FQDN
+           value: {{ .Values.global.xgvela.zk_svc_fqdn }}
+        livenessProbe:
+          httpGet:
+            path: /stats
+            port: 9095
+          initialDelaySeconds: 30
+          periodSeconds: 60
+        volumeMounts:
+        - name: data
+          mountPath: /etc/ves-agent/
+        - name: config
+          mountPath: /etc/config/
+      - name: cim
+        {{- if and (.Values.global) (.Values.global.hub) }}
+        image: {{ .Values.global.hub }}/{{ .Values.oam_sidecar.container.image.repository }}:{{ .Values.oam_sidecar.container.image.tag }}
+        {{- else }}
+        image: {{ .Values.hub }}/{{ .Values.fault_service.container.image.repository }}:{{ .Values.fault_service.container.image.tag }}
+        {{- end }}
+        imagePullPolicy: Always
+        readinessProbe:
+          tcpSocket:
+            port: 6060
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 6060
+          initialDelaySeconds: 20
+          periodSeconds: 10
+        env:
+         - name: MICROSERVICE_NAME
+           value: {{ $cnfHdr.nfVariables.svcname }}
+         - name: ENABLE_KPI
+           value: "false"
+         - name: K8S_POD_ID
+           valueFrom:
+            fieldRef:
+             fieldPath: metadata.name
+         - name: K8S_NAMESPACE
+           valueFrom:
+            fieldRef:
+             fieldPath: metadata.namespace
+        command: ["/bin/bash","-c","NatsSubFb"]
+        resources:
+          limits:
+            cpu: {{ .Values.oam_sidecar.container.resource.limit_cpu }}
+            memory: {{ .Values.oam_sidecar.container.resource.limit_memory }}
+        volumeMounts:
+        - mountPath: {{ .Values.oam_sidecar.container.mount.container_path }}
+          name: mnt-oam-sidecar
+        - mountPath: /opt/conf/
+          name: cim-config
+        - mountPath: /opt/conf/static/
+          name: static-config
+      initContainers:
+        - name: svc-discovery
+          {{- if and (.Values.global) (.Values.global.hub) }}
+          image: {{ .Values.global.hub }}/{{ .Values.ves_gateway.init_container.image.repository }}:{{ .Values.ves_gateway.init_container.image.tag }}
+          {{- else }}
+          image: {{ .Values.hub }}/{{ .Values.ves_gateway.init_container.image.repository }}:{{ .Values.ves_gateway.init_container.image.tag }}
+          {{- end }}
+          imagePullPolicy: Always
+          env:
+          - name: ETCD_SVC_FQDN
+            value: {{ .Values.global.xgvela.etcd_svc_fqdn | default .Values.etcd_svc_fqdn | quote }}
+          - name: KAFKA_SVC_FQDN
+            value: {{ .Values.global.xgvela.kafka_svc_fqdn | default .Values.data.KafkaAddress | quote }}
+          command: [ "/bin/bash", "-c", "svc-discovery.sh \"FMAASEVENTS\" " ]
+        - name: copy
+          {{- if .Values.global.hub }}
+          image: {{ .Values.global.hub }}/{{ .Values.ves_gateway.image.repository }}:{{ .Values.ves_gateway.image.tag }}
+          {{- else }}
+          image: {{ .Values.ves_gateway.image.hub }}/{{ .Values.ves_gateway.image.repository }}:{{ .Values.ves_gateway.image.tag }}
+          {{- end }}
+          command: ["bash", "-c", "cp /vesconf/ves-agent.yml /etc/ves-agent/"]
+          volumeMounts:
+          - mountPath: /vesconf
+            name: config
+          - mountPath: /etc/ves-agent/
+            name: data
+      volumes:
+      - name: data
+        emptyDir: {}
+      - name: mnt-oam-sidecar
+        hostPath:
+          path: {{ .Values.oam_sidecar.container.mount.host_path }}
+          type: {{ .Values.oam_sidecar.container.mount.type }}
+      - configMap:
+          items:
+            - key: cim.json
+              path: cim.json
+          name: {{ $cnfHdr.nfVariables.svcname }}-mgmt-cfg
+        name: cim-config
+      - name: config
+        configMap:
+          name: ves-gateway
+      - configMap:
+          items:
+            - key: common-infra.json
+              path: common-infra.json
+          name: {{ $cnfHdr.nfVariables.svcname }}-static-cfg
+        name: static-config
+
+

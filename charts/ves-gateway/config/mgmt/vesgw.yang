@@ -1,0 +1,263 @@
+module xcf-vesgw-config {
+
+        namespace "urn:rdns:org:xgvela:vesgw";
+        prefix xgvela-vesgw;
+
+        import ietf-inet-types { prefix inet; }
+
+        import tailf-common { prefix tailf; }
+
+        revision "2020-06-22" {
+            description "Removed common infra configurations";
+        }
+        container config{
+
+                tailf:callpoint configUpdate {
+                            tailf:transaction-hook subtree;
+                        }
+                list collectorDetails {
+
+                        key id;
+                        leaf id {
+                                type int32 {
+                                        range "1 .. 5";
+                                }
+                                description "Id for VES Collector ";
+                        }
+                        container primaryCollector {
+                                leaf fqdn {
+                                        type string;
+                                        description "fqdn for collector";
+                                }
+                                leaf port {
+                                        type int32 {
+                                                range "6000 .. 65506";
+                                        }
+                                        description "port for collector";
+                                }
+                                leaf secure {
+                                        type boolean;
+                                        description "establish a secure connection from vesgw to collector";
+                                }
+                                leaf user {
+                                        type string;
+                                        description "username for establishing secure connection";
+                                }
+                                leaf password {
+                                        type string;
+                                        description "password to establish secure connection";
+                                }
+                                leaf passphrase {
+                                        type string;
+                                        description "passphrase for connection between vesgw and collector";
+                                }
+                                leaf nbiFormat {
+                                        type enumeration {
+                                                enum VES;
+                                                enum RCP;
+                                        }
+                                        description "nbiFormat to set RCP or VES format";
+                                }
+                                leaf nbiType {
+                                        type enumeration {
+                                                enum REST;
+                                                enum KAFKA;
+                                        }
+                                        description "nbiType to set REST or KAFKA endpoint";
+                                }
+                                leaf-list kafkaBrokers {
+                                        type string;
+                                        description "List of kafka brokers as url:port.";
+                                }
+                                leaf kafkaTopic {
+                                        type string;
+                                        description "kafka topic";
+                                }
+                                leaf heartbeat {
+                                        type boolean;
+                                        description "Send Heartbeat to collector";
+                                }
+                        }
+
+                        container backupCollector{
+                                leaf fqdn {
+                                        type string;
+                                        description "fqdn for collector";
+                                }
+                                leaf port {
+                                        type int32 {
+                                                range "6000 .. 65506";
+                                        }
+                                        description "port for collector";
+                                }
+                                leaf secure {
+                                        type boolean;
+                                        description "establish a secure connection from vesgw to collector";
+                                }
+                                leaf user {
+                                        type string;
+                                        description "username for establishing secure connection";
+                                }
+                                leaf password {
+                                        type string;
+                                        description "password to establish secure connection";
+                                }
+                                leaf passphrase {
+                                        type string;
+                                        description "passphrase for connection between vesgw and collector";
+                                }
+                                leaf nbiFormat {
+                                        type enumeration {
+                                                enum VES;
+                                                enum RCP;
+                                        }
+                                        description "nbiFormat to set RCP or VES format";
+                                }
+                                leaf nbiType {
+                                        type enumeration {
+                                                enum REST;
+                                                enum KAFKA;
+                                        }
+                                        description "nbiType to set REST or KAFKA endpoint";
+                                }
+                                leaf-list kafkaBrokers {
+                                        type string;
+                                        description "List of kafka brokers as url:port.";
+                                }
+                                leaf kafkaTopic {
+                                        type string;
+                                        description "kafka topic";
+                                }
+                                leaf heartbeat {
+                                        type boolean;
+                                        description "Send Heartbeat to collector";
+                                }
+                        }
+
+                }
+                container vesdomains {
+
+                        container fault {
+                                list collectorList{
+                                        key id;
+                                        leaf id {
+                                                type int32 {
+                                                        range "1 .. 5";
+                                                }
+                                                description "Ids of VES Collector to which faults are configured ";
+                                        }
+                                }
+                        }
+                        container measurement {
+                                list collectorList{
+                                        key id;
+                                        leaf id {
+                                                type int32 {
+                                                        range "1 .. 5";
+                                                }
+                                                description "Ids of VES Collector to which measurements are configured  ";
+                                        }
+                                }
+                        }
+                        container notification {
+                                list collectorList{
+                                        key id;
+                                        leaf id {
+                                                type int32 {
+                                                        range "1 .. 5";
+                                                }
+                                                description "Ids of VES Collector to which notifications are configured  ";
+                                        }
+                                }
+                        }
+                        container tca {
+                                list collectorList{
+                                        key id;
+                                        leaf id {
+                                                type int32 {
+                                                        range "1 .. 5";
+                                                }
+                                                description "Ids of VES Collector to which tcas are configured ";
+                                        }
+                                }
+                        }
+                }
+                container heartbeat {
+                        leaf defaultInterval {
+                                        type string;
+                                        mandatory true;
+                                        description "Default interal configured for heartbeat to collectors";
+                        }
+                }
+                container measurement {
+                        leaf defaultInterval {
+                                        type string;
+                                        mandatory true;
+                                        description "Default interal configured for measurement to collectors";
+                        }
+                        leaf maxBufferingDuration {
+                                        type string;
+                                        mandatory true;
+                                        description "";
+                        }
+                        container prometheus {
+                                leaf address {
+                                        type string;
+                                        mandatory true;
+                                        description "Prometheus server address for measurement";
+                                }
+                                leaf timeout {
+                                        type string;
+                                        mandatory true;
+                                        description "";
+                                }
+                                leaf keepalive {
+                                        type string;
+                                        mandatory true;
+                                        description "";
+                                }
+                        }
+                }
+                container event {
+                        leaf maxSize {
+                                type int32 {
+                                                        range "1 .. 3000000";
+                                                }
+                                mandatory true;
+                                description "";
+                        }
+                        leaf retryInterval {
+                                type string;
+                                mandatory true;
+                                description "";
+                        }
+                        leaf maxMissed {
+                                type int32 {
+                                                        range "1 .. 200";
+                                                }
+                                mandatory true;
+                                description "";
+                        }
+                }
+                container alertManager {
+                        leaf bind {
+                                type string;
+                                mandatory true;
+                                description "";
+                        }
+                }
+                container cluster {
+                        leaf debug {
+                                type boolean;
+                                mandatory true;
+                                description "";
+                        }
+                        leaf displayLogs {
+                                type boolean;
+                                mandatory true;
+                                description "";
+                        }
+                }
+        }
+}
+

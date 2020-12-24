@@ -1,0 +1,30 @@
+{
+	"cimConfig": {
+		"lmaas": {
+			"max_file_size_in_mb": 10,
+			"max_backup_files": 10,
+			"max_age": 7,
+			"buffer_size": 10000,
+			"flush_timeout": 30,
+			"logging_mode": "FILE",
+			"prefer_local_daemonset": false
+		},
+		"haaas": {
+			"hb_interval": 250,
+			"hb_frequency": 2,
+			"ha_timeout": 120
+		},
+		"cim_settings": {
+			"enable_kpi": true,
+			"log_level": "ALL",
+			"cim_file_log": true,
+			"num_garp_count": 1,
+			"remote_svc_retry_count": 60,
+			"ttl_timeout": 1
+		},
+		"app_settings": {
+			"app_port": 8000,
+                        "http2_enabled": false
+		}
+	}
+}

@@ -1,0 +1,175 @@
+module xcf-vesgw-cim {
+
+        namespace "urn:rdns:org:xgvela:vesgw:cim";
+        prefix xgvela-vesgw-cim;
+
+        import ietf-inet-types { prefix inet; }
+
+        import tailf-common { prefix tailf; }
+
+        revision "2020-06-22" {
+            description "Removed common infra configurations";
+        }
+        container cimConfig {
+                tailf:callpoint configUpdate {
+                            tailf:transaction-hook subtree;
+                        }
+                container lmaas {
+                         leaf max_file_size_in_mb {
+                                        type int32 {
+                                        	range "1 .. 50";
+                                        }
+                                        mandatory true;
+                                        description "Maximum file size in MB to truncate.";
+                                }
+
+                         leaf max_backup_files {
+                                        type int32 {
+                                        	range "1 .. 20";
+                                        }
+                                        mandatory true;
+                                        description "Maximum Backup files to keep.";
+                                }
+                         leaf max_age {
+                                        type int32 {
+                                        	range "1 .. 30";
+                                        }
+                                        mandatory true;
+                                        description "Max age to keep backup file in days";
+                                }
+                         leaf buffer_size {
+                                        type int32 {
+                                        	range "1000 .. 100000";
+                                        }
+                                        mandatory true;
+                                        description "Buffer size before writing to file in Bytes.";
+                                }
+                         leaf flush_timeout {
+                                        type int32 {
+                                        	range "5 .. 30";
+                                        }
+                                        mandatory true;
+                                        description "Buffer flush to file timeout in seconds.";
+                                }
+                         leaf logging_mode {
+                                         type enumeration {
+                                                 enum FILE;
+                                                 enum TCP;
+                                                 enum KAFKA;
+                                                 enum STDOUT;
+                                                 enum FILEANDSTDOUT;
+                                            }
+                                        mandatory true;
+                                        description "Logging Mode. Select FILE for file base logging or TCP for tcp based logging or KAFKA for logging to kafka.";
+                                }
+                         leaf prefer_local_daemonset {
+                                        tailf:callpoint restartConfigUpdate {
+                                                tailf:transaction-hook node;
+                                        }
+                                        type boolean;
+                                        mandatory true;
+                                        description "On true pod will send data to the local daemonset";
+                                }
+                }
+
+                container haaas{
+                         leaf hb_interval {
+                                        tailf:callpoint restartConfigUpdate {
+                                                tailf:transaction-hook node;
+                                        }
+                                        type int32 {
+                                        	range "100 .. 500";
+                                        }
+                                        mandatory true;
+                                        description "Heart beat interval in milli seconds.";
+                                }
+                         leaf hb_frequency {
+                                        tailf:callpoint restartConfigUpdate {
+                                                tailf:transaction-hook node;
+                                        }
+                                        type int32{
+                                        	range "1 .. 20";
+                                        }
+                                        mandatory true;
+                                        description "Heart beat frequency as aInteger";
+                                }
+                         leaf ha_timeout {
+                                        tailf:callpoint restartConfigUpdate {
+                                                tailf:transaction-hook node;
+                                        }
+                                        type int32 {
+                                        	range "60 .. 120";
+                                        }
+                                        mandatory true;
+                                        description "HA Timeout in seconds.";
+                                }
+              }
+                container cim_settings {
+                         leaf enable_kpi {
+                                        type boolean;
+                                        mandatory true;
+                                        description "For promotheus metrics make kpi(key performance indecator) true.";
+                                }
+                         leaf log_level {
+                                        type enumeration {
+                                                 enum INFO;
+                                                 enum DEBUG;
+                                                 enum ERROR;
+                                                 enum WARNING;
+                                                 enum EXCEPTION;
+                                                 enum ALL;
+                                            }
+                                        mandatory true;
+                                        description "Log Level for CIM to print. select all if want to print all levels.";
+                                }
+                         leaf cim_file_log {
+                                        type boolean;
+                                        mandatory true;
+                                        description "Enable if CIM needs to maintain own log file for CIM.";
+                                }
+                         leaf num_garp_count {
+                                        type int32 {
+                                        	range "0 .. 5";
+                                        }
+                                        mandatory true;
+                                        description "Number of gratuitous arp packet sent [0-5]";
+                                }
+                        leaf remote_svc_retry_count {
+                                        type int32 {
+                                        	range "1 .. 600";
+                                        }
+                                        mandatory true;
+                                        description "Number of retry [1-600]";
+                                }
+                        leaf ttl_timeout {
+                                        tailf:callpoint restartConfigUpdate {
+                                                tailf:transaction-hook node;
+                                        }
+                                        type int32 {
+                                        	range "1 .. 600";
+                                        }
+                                        mandatory true;
+                                        description "TTL timeout [1-600]";
+                                }
+
+              }
+
+                container app_settings {
+            	             leaf app_port {
+                                        type int32 {
+                                        	range "5000 .. 10000";
+                                        }
+                                        mandatory true;
+                                        description "Port to communicate with Application.";
+                                }
+                         leaf http2_enabled {
+                                    tailf:callpoint restartConfigUpdate {
+                                                tailf:transaction-hook node;
+                                        }
+                                        type boolean;
+                                        mandatory true;
+                                        description "Enable if client needs HTTP2 support.";
+                                }
+              }
+        }
+}

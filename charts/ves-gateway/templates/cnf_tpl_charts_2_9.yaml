@@ -1,0 +1,142 @@
+#CNF TEMPLATE - NAMESPACE
+{{ $cnfHdr := (dict "" "") -}}
+{{- include "cnfTplHeader_2_9" (dict "cnfHdr" $cnfHdr "dot" . ) -}}
+{{- if and (eq true $cnfHdr.nfVariables.root.Values.nf.cnftpl_namespaces.create) (.Values.global) (.Values.global.xgvela) (.Values.global.xgvela.create_ns) -}}
+apiVersion: v1
+kind: Namespace
+{{- $_ := set $cnfHdr.nfVariables "component_name" ($cnfHdr.nfVariables.nfPrefix|toString) -}}
+{{- $_ := set $cnfHdr.nfVariables "create_meta_ns" "false" -}}
+{{- include "cnfTplMetadata_2_9" (dict "setOffset" "0" "cnfHdr" $cnfHdr "metadata" $cnfHdr.nfVariables.root.Values.nf.cnftpl_namespaces.metaspec) }}
+{{- end }}
+
+#CNF TEMPLATE - CONFIGMAP
+{{ $cnfHdr := (dict "" "") -}}
+{{- include "cnfTplHeader_2_9" (dict "cnfHdr" $cnfHdr "dot" . ) -}}
+{{/* $defaultVariables := .Values.default -}}
+{{- $root := . -*/}}
+{{- $configtype := (list "static-cfg" "env-cfg" "mgmt-cfg" "dashboard-cfg" "eventdef-cfg" "alerts-cfg" "metrics-cfg") -}}
+{{- $service_name := $cnfHdr.nfVariables.svcname -}}
+#{{- $service_version := $cnfHdr.nfVariables.svcVersion -}}
+{{- $nfVariables := $cnfHdr.nfVariables -}}
+{{- range $index, $type := $configtype -}}
+{{- $_ := set $nfVariables "component_name" (printf "%s-%s" ($service_name|toString) ($type|toString)) -}}
+{{- $_ := set $nfVariables "configtype" ($type|toString) -}}
+{{- $specOffset := 0 -}}
+{{- if (and (eq ($type|toString) "static-cfg" ) (eq true $cnfHdr.nfVariables.root.Values.nf.cnftpl_configmap.static_cfg.create)) -}}
+{{- printf "%s" "apiVersion: v1" | nindent (add $specOffset 0 | int) -}}
+{{- printf "%s" "kind: ConfigMap" | nindent (add $specOffset 0 | int) -}}
+{{- include "metaSpec_2_9" (merge (dict "specOffset" (add $specOffset 0 | int) "metaSpec" $cnfHdr.nfVariables.root.Values.nf.cnftpl_configmap.static_cfg.metaspec) (dict "nfVariables" $nfVariables)) -}}
+{{- tpl (include "configMapDataSpec_2_9" (merge (dict "specOffset" (add $specOffset 0 | int) ) (dict "nfVariables" $nfVariables))) $ -}}
+{{- printf "---" | nindent (add $specOffset 0 | int) -}}
+{{- else if (and (eq ($type|toString) "env-cfg" ) (eq true $cnfHdr.nfVariables.root.Values.nf.cnftpl_configmap.env_cfg.create)) -}}
+{{- printf "%s" "apiVersion: v1" | nindent (add $specOffset 0 | int) -}}
+{{- printf "%s" "kind: ConfigMap" | nindent (add $specOffset 0 | int) -}}
+{{- include "metaSpec_2_9" (merge (dict "specOffset" (add $specOffset 0 | int) "metaSpec" $cnfHdr.nfVariables.root.Values.nf.cnftpl_configmap.env_cfg.metaspec) (dict "nfVariables" $nfVariables)) -}}
+{{- tpl (include "configMapDataSpec_2_9" (merge (dict "specOffset" (add $specOffset 0 | int) ) (dict "nfVariables" $nfVariables))) $ -}}
+{{- printf "---" | nindent (add $specOffset 0 | int) -}}
+{{- else if (and (eq ($type|toString) "mgmt-cfg" ) (eq true $cnfHdr.nfVariables.root.Values.nf.cnftpl_configmap.mgmt_cfg.create)) -}}
+{{- $_ := set $nfVariables "annotations" (printf "microSvcName:%s\nenableConfigMgmt: true\ninit: true" ($service_name|toString)) -}}
+{{- printf "%s" "apiVersion: v1" | nindent (add $specOffset 0 | int) -}}
+{{- printf "%s" "kind: ConfigMap" | nindent (add $specOffset 0 | int) -}}
+{{- include "metaSpec_2_9" (merge (dict "specOffset" (add $specOffset 0 | int) "metaSpec" $cnfHdr.nfVariables.root.Values.nf.cnftpl_configmap.mgmt_cfg.metaspec) (dict "nfVariables" $nfVariables)) -}}
+{{- tpl (include "configMapDataSpec_2_9" (merge (dict "specOffset" (add $specOffset 0 | int) ) (dict "nfVariables" $nfVariables))) $ -}}
+{{- printf "---" | nindent (add $specOffset 0 | int) -}}
+{{- else if (and (eq ($type|toString) "dashboard-cfg" ) (eq true $cnfHdr.nfVariables.root.Values.nf.cnftpl_dashboard.create)) -}}
+{{- printf "%s" "apiVersion: v1" | nindent (add $specOffset 0 | int) -}}
+{{- printf "%s" "kind: ConfigMap" | nindent (add $specOffset 0 | int) -}}
+{{- include "metaSpec_2_9" (merge (dict "specOffset" (add $specOffset 0 | int) "metaSpec" $cnfHdr.nfVariables.root.Values.nf.cnftpl_dashboard.metaspec) (dict "nfVariables" $nfVariables)) -}}
+{{- include "configMapDataSpec_2_9" (merge (dict "specOffset" (add $specOffset 0 | int) ) (dict "nfVariables" $nfVariables)) -}}
+{{- printf "---" | nindent (add $specOffset 0 | int) -}}
+{{- else if (and (eq ($type|toString) "eventdef-cfg" ) (eq true $cnfHdr.nfVariables.root.Values.nf.cnftpl_eventdef.create)) -}}
+{{- printf "%s" "apiVersion: v1" | nindent (add $specOffset 0 | int) -}}
+{{- printf "%s" "kind: ConfigMap" | nindent (add $specOffset 0 | int) -}}
+{{- include "metaSpec_2_9" (merge (dict "specOffset" (add $specOffset 0 | int) "metaSpec" $cnfHdr.nfVariables.root.Values.nf.cnftpl_eventdef.metaspec) (dict "nfVariables" $nfVariables)) -}}
+{{- include "configMapDataSpec_2_9" (merge (dict "specOffset" (add $specOffset 0 | int) ) (dict "nfVariables" $nfVariables)) -}}
+{{- printf "---" | nindent (add $specOffset 0 | int) -}}
+{{- else if (and (eq ($type|toString) "alerts-cfg" ) (eq true $cnfHdr.nfVariables.root.Values.nf.cnftpl_alertsdef.create)) -}}
+{{- printf "%s" "apiVersion: v1" | nindent (add $specOffset 0 | int) -}}
+{{- printf "%s" "kind: ConfigMap" | nindent (add $specOffset 0 | int) -}}
+{{- include "metaSpec_2_9" (merge (dict "specOffset" (add $specOffset 0 | int) "metaSpec" $cnfHdr.nfVariables.root.Values.nf.cnftpl_alertsdef.metaspec) (dict "nfVariables" $nfVariables)) -}}
+{{- tpl (include "configMapDataSpec_2_9" (merge (dict "specOffset" (add $specOffset 0 | int) ) (dict "nfVariables" $nfVariables))) $ -}}
+{{- printf "---" | nindent (add $specOffset 0 | int) -}}
+{{- else if (and (eq ($type|toString) "metrics-cfg" ) (eq true $cnfHdr.nfVariables.root.Values.nf.cnftpl_metricsdef.create)) -}}
+{{- printf "%s" "apiVersion: v1" | nindent (add $specOffset 0 | int) -}}
+{{- printf "%s" "kind: ConfigMap" | nindent (add $specOffset 0 | int) -}}
+{{- include "metaSpec_2_9" (merge (dict "specOffset" (add $specOffset 0 | int) "metaSpec" $cnfHdr.nfVariables.root.Values.nf.cnftpl_metricsdef.metaspec) (dict "nfVariables" $nfVariables)) -}}
+{{- include "configMapDataSpec_2_9" (merge (dict "specOffset" (add $specOffset 0 | int) ) (dict "nfVariables" $nfVariables)) -}}
+{{- printf "---" | nindent (add $specOffset 0 | int) -}}
+{{- end -}}
+{{- end }}
+
+{{ $cnfHdr := (dict "" "") -}}
+{{- include "cnfTplHeader_2_9" (dict "cnfHdr" $cnfHdr "dot" . ) -}}
+{{- $configtype := "dashboard-cfg" -}}
+{{- $service_name := $cnfHdr.nfVariables.svcname -}}
+#{{- $service_version := $cnfHdr.nfVariables.svcVersion -}}
+{{- $nfVariables := $cnfHdr.nfVariables -}}
+{{- $_ := set $nfVariables "component_name" (printf "%s-%s" ($service_name|toString) ($configtype|toString)) -}}
+{{- $_ := set $nfVariables "configtype" ($configtype|toString) -}}
+{{- $specOffset := 0 -}}
+{{- if (eq true $cnfHdr.nfVariables.root.Values.nf.cnftpl_dashboard.create) -}}
+{{- printf "%s" "apiVersion: batch/v1" | nindent (add $specOffset 0 | int) -}}
+{{- printf "%s" "kind: Job" | nindent (add $specOffset 0 | int) -}}
+{{- include "metaSpec_2_9" (merge (dict "specOffset" (add $specOffset 0 | int) "metaSpec" $cnfHdr.nfVariables.root.Values.nf.cnftpl_dashboard.metaspec) (dict "nfVariables" $nfVariables)) -}}
+{{printf "" }}
+spec:
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      containers:
+      - name: app-dash-provision
+        image: {{ .Values.global.hub }}/app-dash-client:1.1
+        imagePullPolicy: Always
+        env:
+         - name: GRAFANA_URL
+{{- if and (.Values.global) (.Values.global.xgvela) (.Values.global.xgvela.grafana) }}
+           value: {{ .Values.global.xgvela.grafana.url }}
+{{- else }}
+           value: "http://grafana.xgvela-paas:3000"
+{{- end }}
+         - name: GRAFANA_USER
+{{- if and (.Values.global) (.Values.global.xgvela) (.Values.global.xgvela.grafana) }}
+           value: {{ .Values.global.xgvela.grafana.user }}
+{{- else }}
+           value: "admin"
+{{- end }}
+         - name: GRAFANA_PASSWORD
+{{- if and (.Values.global) (.Values.global.xgvela) (.Values.global.xgvela.grafana) }}
+           value: {{ .Values.global.xgvela.grafana.password }}
+{{- else }}
+           value: "admin"
+{{- end }}
+        command: ["/bin/bash", "-c"]
+        args:
+        - /opt/bin/create_dashboard.sh
+        volumeMounts:
+          - mountPath: /dashboards/
+            name: app-dash
+      volumes:
+        - configMap:
+            name: {{$nfVariables.component_name}}
+          name: app-dash
+      restartPolicy: OnFailure
+{{- printf "---" | nindent (add $specOffset 0 | int) -}}
+{{- end }}
+
+#CNF TEMPLATE - SECRET
+{{ $cnfHdr := (dict "" "") -}}
+{{- include "cnfTplHeader_2_9" (dict "cnfHdr" $cnfHdr "dot" . ) -}}
+{{- $service_name := $cnfHdr.nfVariables.svcname -}}
+#{{- $service_version := $cnfHdr.nfVariables.svcVersion -}}
+{{- $nfVariables := $cnfHdr.nfVariables -}}
+{{- if $cnfHdr.nfVariables.root.Values.nf.cnftpl_secret.create -}}
+apiVersion: v1
+kind: Secret
+{{- $specOffset := 0 -}}
+{{- include "metaSpec_2_9" (merge (dict "specOffset" (add $specOffset 0 | int) "metaSpec" $cnfHdr.nfVariables.root.Values.nf.cnftpl_secret.metaspec) (dict "nfVariables" $nfVariables)) -}}
+{{- include "secretSpec" (merge (dict "specOffset" (add $specOffset 0 | int) "secretSpec" (.Values.nf.cnftpl_secret.secretspec)) (dict "nfVariables" $nfVariables)) -}}
+{{- end }}
+
+

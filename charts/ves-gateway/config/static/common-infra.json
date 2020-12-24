@@ -1,0 +1,12 @@
+{
+	
+		"logging_svc_url": "{{.Values.global.xgvela.logging_svc_url}}",
+		"logging_svc_tcp_port": "{{.Values.global.xgvela.logging_svc_tcp_port}}",
+		"kafka_brokers": [
+			"{{.Values.global.xgvela.kafka_svc_fqdn}}"
+		],
+		"etcd_url": "{{.Values.global.xgvela.etcd_svc_fqdn}}",
+                "enable_retrx": "{{.Values.global.xgvela.enable_retrx}}",
+                "log_format": "{{.Values.global.xgvela.log_format}}"
+	
+}

@@ -1,0 +1,8 @@
+#metrics:
+#  AdditionalObjects:
+#    - object_name: CMaaSCommitCounters
+#      object_instance: CommitConfigSuccess
+#      expr: rate (cmaas_appln_commit_config_success_total [5m])
+#      object_keys:
+#      - name: microSvcName
+#        expr: '{{.labels.microSvcName}}'

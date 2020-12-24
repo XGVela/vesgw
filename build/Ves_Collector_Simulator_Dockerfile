@@ -1,0 +1,59 @@
+# Start from golang v1.12 base image
+FROM golang:1.12 as gobuild
+
+ARG VESSIM_BUILDER_LABEL
+
+RUN echo "Tagging Label IMAGE-TYPE=$VESSIM_BUILDER_LABEL"
+LABEL IMAGE-TYPE="$VESSIM_BUILDER_LABEL"
+
+
+# Set the Working Directory for ves-agent inside the container
+RUN mkdir -p $GOPATH/src/VESPA
+WORKDIR $GOPATH/src/VESPA
+
+# Clone VES Agent v0.3.0 from github
+#RUN git clone -b v0.3.0 https://github.com/nokia/ONAP-VESPA.git $GOPATH/src/VESPA
+COPY VESPA $GOPATH/src/VESPA
+
+RUN GO111MODULE=on go mod download
+
+# Install VES Agent
+RUN export GOPATH=$HOME/go && \
+    export PATH=$GOPATH/bin:$GOROOT/bin:$PATH && \
+#    go install -v ./ves-agent
+	go install -v ./ves-simu
+
+# Set the Working Directory for vesmgr inside the container
+RUN mkdir -p $GOPATH/src/vesmgr
+WORKDIR $GOPATH/src/vesmgr
+
+# Copy vesmgr to the Working Directory
+COPY $HOME/ .
+
+RUN ./build_vesagent.sh
+
+#################
+#
+# Second phase, copy compiled stuff to a runtime container
+
+# Ubuntu or something smaller?
+FROM ubuntu:18.04
+#FROM alpine:3.9.5
+
+#ENV http_proxy http://10.1.20.57:80/
+#ENV https_proxy http://10.1.20.57:80/
+
+# For trouble-shooting
+RUN apt-get update; apt-get install -y \
+    iputils-ping \
+    net-tools \
+    curl \
+	vim
+
+# Create the configuration directory for ves agent
+RUN mkdir -p /etc/ves-agent
+COPY --from=gobuild root/go/bin /root/go/bin
+
+ENV PATH="/root/go/bin:${PATH}"
+
+ENTRYPOINT ["ves-simu"]

@@ -1,0 +1,12 @@
+/.vscode
+/data
+*.exe
+*debug.test
+/dist
+/build
+/bin
+/pkg
+node_modules
+*.pem
+a_main-packr.go
+coverage.txt
