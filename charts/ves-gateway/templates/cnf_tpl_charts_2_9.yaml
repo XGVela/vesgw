@@ -68,63 +68,6 @@ kind: Namespace
 {{- end -}}
 {{- end }}
 
-{{ $cnfHdr := (dict "" "") -}}
-{{- include "cnfTplHeader_2_9" (dict "cnfHdr" $cnfHdr "dot" . ) -}}
-{{- $configtype := "dashboard-cfg" -}}
-{{- $service_name := $cnfHdr.nfVariables.svcname -}}
-#{{- $service_version := $cnfHdr.nfVariables.svcVersion -}}
-{{- $nfVariables := $cnfHdr.nfVariables -}}
-{{- $_ := set $nfVariables "component_name" (printf "%s-%s" ($service_name|toString) ($configtype|toString)) -}}
-{{- $_ := set $nfVariables "configtype" ($configtype|toString) -}}
-{{- $specOffset := 0 -}}
-{{- if (eq true $cnfHdr.nfVariables.root.Values.nf.cnftpl_dashboard.create) -}}
-{{- printf "%s" "apiVersion: batch/v1" | nindent (add $specOffset 0 | int) -}}
-{{- printf "%s" "kind: Job" | nindent (add $specOffset 0 | int) -}}
-{{- include "metaSpec_2_9" (merge (dict "specOffset" (add $specOffset 0 | int) "metaSpec" $cnfHdr.nfVariables.root.Values.nf.cnftpl_dashboard.metaspec) (dict "nfVariables" $nfVariables)) -}}
-{{printf "" }}
-spec:
-  template:
-    metadata:
-      annotations:
-        sidecar.istio.io/inject: "false"
-    spec:
-      containers:
-      - name: app-dash-provision
-        image: {{ .Values.global.hub }}/app-dash-client:1.1
-        imagePullPolicy: Always
-        env:
-         - name: GRAFANA_URL
-{{- if and (.Values.global) (.Values.global.xgvela) (.Values.global.xgvela.grafana) }}
-           value: {{ .Values.global.xgvela.grafana.url }}
-{{- else }}
-           value: "http://grafana.xgvela-paas:3000"
-{{- end }}
-         - name: GRAFANA_USER
-{{- if and (.Values.global) (.Values.global.xgvela) (.Values.global.xgvela.grafana) }}
-           value: {{ .Values.global.xgvela.grafana.user }}
-{{- else }}
-           value: "admin"
-{{- end }}
-         - name: GRAFANA_PASSWORD
-{{- if and (.Values.global) (.Values.global.xgvela) (.Values.global.xgvela.grafana) }}
-           value: {{ .Values.global.xgvela.grafana.password }}
-{{- else }}
-           value: "admin"
-{{- end }}
-        command: ["/bin/bash", "-c"]
-        args:
-        - /opt/bin/create_dashboard.sh
-        volumeMounts:
-          - mountPath: /dashboards/
-            name: app-dash
-      volumes:
-        - configMap:
-            name: {{$nfVariables.component_name}}
-          name: app-dash
-      restartPolicy: OnFailure
-{{- printf "---" | nindent (add $specOffset 0 | int) -}}
-{{- end }}
-
 #CNF TEMPLATE - SECRET
 {{ $cnfHdr := (dict "" "") -}}
 {{- include "cnfTplHeader_2_9" (dict "cnfHdr" $cnfHdr "dot" . ) -}}
