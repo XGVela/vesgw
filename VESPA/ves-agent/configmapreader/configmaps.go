@@ -71,13 +71,13 @@ func GetServicePortCMaas() {
 
 	client, _ := NewKubeConfig()
 	/*options := metaV1.ListOptions{
-		LabelSelector: labels.Set{"microSvcName": "config-service"}.AsSelector().String(),
+		LabelSelector: labels.Set{"microSvcName": "cmaas"}.AsSelector().String(),
 	}*/
 
-	//labelSelector := metaV1.LabelSelector{MatchLabels: map[string]string{"microSvcName": "config-service"}}
+	//labelSelector := metaV1.LabelSelector{MatchLabels: map[string]string{"microSvcName": "cmaas"}}
 	listOptions := metaV1.ListOptions{
 		//LabelSelector: labels.Set(labelSelector.MatchLabels).String(),
-		LabelSelector: "microSvcName=config-service",
+		LabelSelector: "microSvcName=cmaas",
 		Limit:         100,
 	}
 	services, _ := client.Client.CoreV1().Services(os.Getenv("K8S_NAMESPACE")).List(listOptions)

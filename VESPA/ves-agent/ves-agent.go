@@ -196,8 +196,8 @@ func InitializeVesGwDefaultConf() {
 func GetVesgwConfigMap() (*v1.ConfigMap, error) {
 	client, _ := configmapreader.NewKubeConfig()
 
-	configMapName := "ves-gateway-mgmt-cfg"
-	//configMapName := "ves-gateway-v0.9.1-mgmt-cfg"
+	configMapName := "vesgw-mgmt-cfg"
+	//configMapName := "vesgw-v0.9.1-mgmt-cfg"
 	fmt.Println("VESGW config map name", configMapName)
 
 	Configmap, err := client.Client.CoreV1().ConfigMaps(os.Getenv("K8S_NAMESPACE")).Get(configMapName, metaV1.GetOptions{})
@@ -681,7 +681,7 @@ func xgvelaRegister() int {
 	cimport := "6060"
 
 	registerDetails := map[string]string{
-		"container_name": "ves-gateway",
+		"container_name": "vesgw",
 		"container_id":   os.Getenv("K8S_CONTAINER_ID"),
 	}
 

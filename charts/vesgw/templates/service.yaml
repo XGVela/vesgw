@@ -12,13 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+{{- $cnfHdr := (dict "" "") -}}
+{{- include "cnfTplHeader_2_9" (dict "cnfHdr" $cnfHdr "dot" . ) -}}
 apiVersion: v1
-appVersion: 0.3.0
-description: A Helm chart for VES Gateway.
-engine: gotpl
-maintainers:
-- email: maintainer@xgvela.org
-  name: xGVela Maintainer
-name: ves-gateway
-tillerVersion: '>=2.8.0'
-version: 0.2.0
+kind: Service
+{{- include "cnfTplMetadata_2_9" (dict "setOffset" "0" "cnfHdr" $cnfHdr "metadata" .Values.componentSpec.service.metaspec) }}
+spec:
+  selector:
+    app: vesgw
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: 9095
+      protocol: TCP
+      name: http
+    - port: 8095
+      targetPort: 8095
+      protocol: TCP
+      name: client
+  type: {{ .Values.service.type }}

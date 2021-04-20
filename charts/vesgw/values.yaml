@@ -59,10 +59,10 @@ namespace: xgvela-xgvela1-mgmt-xgvela-xgvela1
 etcd_svc_fqdn: "etcd.xgvela-xgvela1-infra-xgvela-xgvela1.svc.cluster.local:2379"
 
 common:
-  app_name: ves-gateway
+  app_name: vesgw
 
 
-serviceaccount: ves-gateway
+serviceaccount: vesgw
 
 componentSpec:
   deployment:
@@ -70,7 +70,7 @@ componentSpec:
       ext_name: v1
     pod_metaspec:
       labels:
-        app: ves-gateway
+        app: vesgw
       annotations:
         sidecar.istio.io/inject: "false"
         prometheus.io/scrape: "true"
@@ -79,7 +79,7 @@ componentSpec:
   service:
     metaspec:
       labels:
-        app: ves-gateway
+        app: vesgw
   configmap:
      metaspec:
        ext_name: config
