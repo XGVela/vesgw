@@ -50,8 +50,8 @@ mkdir -p $ARTIFACTS_PATH/charts
 echo -e "\e[1;32;40m[CIM-BUILD] Releasing Artifacts... @$ARTIFACTS_PATH \e[0m"
 docker save ves-gw:$1 | gzip > $ARTIFACTS_PATH/images/ves-gw-$1.tar.gz
 docker save ves-sim:$2 | gzip > $ARTIFACTS_PATH/images/ves-sim-$2.tar.gz
-cp -rf charts/ves-gateway $ARTIFACTS_PATH/charts/
-sed -i "s/ves_gw_tag/$1/" $ARTIFACTS_PATH/charts/ves-gateway/values.yaml
+cp -rf charts/vesgw $ARTIFACTS_PATH/charts/
+sed -i "s/ves_gw_tag/$1/" $ARTIFACTS_PATH/charts/vesgw/values.yaml
 cp -rf charts/ves-simulator $ARTIFACTS_PATH/charts/
 sed -i "s/ves_simulator_tag/$2/" $ARTIFACTS_PATH/charts/ves-simulator/values.yaml
 

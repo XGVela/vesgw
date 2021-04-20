@@ -114,11 +114,11 @@ data:
       {{- if eq .Values.data.cluster.enable true}}
       id: ""
       peers:
-        - id: "ves-gateway-0"
-          address: "ves-gateway-0.ves-gateway.xgvela-xgvela1-mgmt-xgvela-xgvela1.svc.cluster.local:6737"
-        - id: "ves-gateway-1"
-          address: "ves-gateway-1.ves-gateway.xgvela-xgvela1-mgmt-xgvela-xgvela1.svc.cluster.local:6737"
-        - id: "ves-gateway-2"
-          address: "ves-gateway-2.ves-gateway.xgvela-xgvela1-mgmt-xgvela-xgvela1.svc.cluster.local:6737"
+        - id: "vesgw-0"
+          address: "vesgw-0.vesgw.xgvela-xgvela1-mgmt-xgvela-xgvela1.svc.cluster.local:6737"
+        - id: "vesgw-1"
+          address: "vesgw-1.vesgw.xgvela-xgvela1-mgmt-xgvela-xgvela1.svc.cluster.local:6737"
+        - id: "vesgw-2"
+          address: "vesgw-2.vesgw.xgvela-xgvela1-mgmt-xgvela-xgvela1.svc.cluster.local:6737"
       {{- end}}
     loglevel: {{.Values.data.loglevel}}
