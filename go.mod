@@ -1,6 +1,6 @@
 module RIC_VESAgent
 
-go 1.12
+go 1.13
 
 require (
 	gerrit.o-ran-sc.org/r/com/golog.git v0.0.1
