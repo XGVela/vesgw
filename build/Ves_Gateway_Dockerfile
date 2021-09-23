@@ -1,4 +1,4 @@
-# Start from golang v1.12 base image
+# Start from golang v1.13 base image
 FROM golang:1.13 as gobuild
 
 ARG VESGW_BUILDER_LABEL

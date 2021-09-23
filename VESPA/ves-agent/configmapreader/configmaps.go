@@ -105,12 +105,12 @@ func GetServicePortFMaas() {
 
 	client, _ := NewKubeConfig()
 	/*options := metaV1.ListOptions{
-		LabelSelector: labels.Set{"microSvcName": "fault-service"}.AsSelector().String(),
+		LabelSelector: labels.Set{"microSvcName": "fmaas"}.AsSelector().String(),
 	}*/
-	//labelSelector := metaV1.LabelSelector{MatchLabels: map[string]string{"microSvcName": "fault-service"}}
+	//labelSelector := metaV1.LabelSelector{MatchLabels: map[string]string{"microSvcName": "fmaas"}}
 	listOptions := metaV1.ListOptions{
 		//LabelSelector: labels.Set(labelSelector.MatchLabels).String(),
-		LabelSelector: "microSvcName=fault-service",
+		LabelSelector: "microSvcName=fmaas",
 		Limit:         100,
 	}
 	services, _ := client.Client.CoreV1().Services(os.Getenv("K8S_NAMESPACE")).List(listOptions)
