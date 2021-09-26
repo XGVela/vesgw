@@ -1,16 +1,3 @@
-# Copyright 2021 Mavenir
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
 {{- $cnfHdr := (dict "" "") -}}
 {{- include "cnfTplHeader_2_9" (dict "cnfHdr" $cnfHdr "dot" . ) -}}
@@ -34,11 +21,11 @@ spec:
       containers:
       - name: {{ .Values.common.app_name }}
         {{- if .Values.global.hub }}
-        image: {{ .Values.global.hub }}/{{ .Values.ves_gateway.image.repository }}:{{ .Values.ves_gateway.image.tag }}
+        image: {{ .Values.global.hub }}/{{ .Values.vesgw.image.repository }}:{{ .Values.vesgw.image.tag }}
         {{- else }}
-        image: {{ .Values.ves_gateway.image.hub }}/{{ .Values.ves_gateway.image.repository }}:{{ .Values.ves_gateway.image.tag }}
+        image: {{ .Values.vesgw.image.hub }}/{{ .Values.vesgw.image.repository }}:{{ .Values.vesgw.image.tag }}
         {{- end }}
-        imagePullPolicy: {{ .Values.ves_gateway.image.pullPolicy }}
+        imagePullPolicy: {{ .Values.vesgw.image.pullPolicy }}
         ports:
           - name: http
             containerPort: 9095
@@ -71,7 +58,7 @@ spec:
         {{- else }}
         image: {{ .Values.hub }}/{{ .Values.fault_service.container.image.repository }}:{{ .Values.fault_service.container.image.tag }}
         {{- end }}
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         readinessProbe:
           tcpSocket:
             port: 6060
@@ -110,11 +97,11 @@ spec:
       initContainers:
         - name: svc-discovery
           {{- if and (.Values.global) (.Values.global.hub) }}
-          image: {{ .Values.global.hub }}/{{ .Values.ves_gateway.init_container.image.repository }}:{{ .Values.ves_gateway.init_container.image.tag }}
+          image: {{ .Values.global.hub }}/{{ .Values.vesgw.init_container.image.repository }}:{{ .Values.vesgw.init_container.image.tag }}
           {{- else }}
-          image: {{ .Values.hub }}/{{ .Values.ves_gateway.init_container.image.repository }}:{{ .Values.ves_gateway.init_container.image.tag }}
+          image: {{ .Values.hub }}/{{ .Values.vesgw.init_container.image.repository }}:{{ .Values.vesgw.init_container.image.tag }}
           {{- end }}
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           env:
           - name: ETCD_SVC_FQDN
             value: {{ .Values.global.xgvela.etcd_svc_fqdn | default .Values.etcd_svc_fqdn | quote }}
@@ -123,9 +110,9 @@ spec:
           command: [ "/bin/bash", "-c", "svc-discovery.sh \"FMAASEVENTS\" " ]
         - name: copy
           {{- if .Values.global.hub }}
-          image: {{ .Values.global.hub }}/{{ .Values.ves_gateway.image.repository }}:{{ .Values.ves_gateway.image.tag }}
+          image: {{ .Values.global.hub }}/{{ .Values.vesgw.image.repository }}:{{ .Values.vesgw.image.tag }}
           {{- else }}
-          image: {{ .Values.ves_gateway.image.hub }}/{{ .Values.ves_gateway.image.repository }}:{{ .Values.ves_gateway.image.tag }}
+          image: {{ .Values.vesgw.image.hub }}/{{ .Values.vesgw.image.repository }}:{{ .Values.vesgw.image.tag }}
           {{- end }}
           command: ["bash", "-c", "cp /vesconf/ves-agent.yml /etc/ves-agent/"]
           volumeMounts:
